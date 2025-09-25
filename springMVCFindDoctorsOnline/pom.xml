@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="https://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0   
+                             https://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.doctors</groupId>
+   <artifactId>SpringMVCFindDoctorsOnline</artifactId>
+   <packaging>war</packaging>
+   <properties>
+      <maven.compiler.source>9</maven.compiler.source>
+      <maven.compiler.target>9</maven.compiler.target>
+   </properties>
+   <version>0.0.1-SNAPSHOT</version>
+   <name>SpringMVCFindDoctorsOnline Maven Webapp</name>
+   <url>http://maven.apache.org</url>
+   <dependencies>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.12</version>
+         <scope>test</scope>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+      <dependency>
+         <groupId>org.mockito</groupId>
+         <artifactId>mockito-all</artifactId>
+         <version>1.9.5</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-webmvc</artifactId>
+         <version>5.1.1.RELEASE</version>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-context</artifactId>
+         <version>5.1.1.RELEASE</version>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-test</artifactId>
+         <version>5.1.1.RELEASE</version>
+         <scope>test</scope>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jasper -->
+      <dependency>
+         <groupId>org.apache.tomcat</groupId>
+         <artifactId>tomcat-jasper</artifactId>
+         <version>9.0.12</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <version>3.0-alpha-1</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/javax.servlet/jstl -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jstl</artifactId>
+         <version>1.2</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+      <dependency>
+         <groupId>mysql</groupId>
+         <artifactId>mysql-connector-java</artifactId>
+         <version>8.0.11</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-jdbc</artifactId>
+         <version>5.1.1.RELEASE</version>
+      </dependency>
+   </dependencies>
+   <build>
+      <finalName>SpringMVCFindDoctorsOnline</finalName>
+      <sourceDirectory>src/main/java</sourceDirectory>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M3</version>
+            <configuration>
+               <testFailureIgnore>true</testFailureIgnore>
+               <shutdown>kill</shutdown>
+               <!-- Use it if required-->
+            </configuration>
+         </plugin>
+         <!-- This should be added to overcome Could not initialize 
+              class org.apache.maven.plugin.war.util.WebappStructureSerializer -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.2</version>
+         </plugin>
+      </plugins>
+   </build>
+</project>
