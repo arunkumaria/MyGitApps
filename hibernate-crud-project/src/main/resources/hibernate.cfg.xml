@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hibernate-configuration>
+    <session-factory>
+		<!-- Automatically update or create tables -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+		<!-- Database connection details -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/student_info?serverTimezone=UTC</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">dinavella5</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
+
+		<!-- Mapping class -->
+        <mapping class="com.own.hcp.entity.Student"/>
+    </session-factory>
+</hibernate-configuration>

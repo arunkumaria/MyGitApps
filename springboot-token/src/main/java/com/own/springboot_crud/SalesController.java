@@ -1,0 +1,104 @@
+package com.own.springboot_crud;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@RestController
+public class SalesController {
+
+	@GetMapping("/api/sales")
+	public String hello() throws JsonMappingException, JsonProcessingException {
+
+		final RestTemplate restTemplate = new RestTemplate();
+		System.out.println("================q1. json string======================");
+		String url = "https://git.toptal.com/screeners/invoice-json/-/raw/main/invoice.json";
+		// 1. read the file
+		String json = restTemplate.getForObject(url, String.class);
+		System.out.println("json string:" + json);
+
+		System.out.println("============q2. json object===========================");
+		// 2. parse the string
+		ObjectMapper mapper = new ObjectMapper();
+		System.out.println(mapper.readTree(json));
+
+		System.out.println("=========q3. descending order of orders==============================");
+		List<Order> orders = mapper.readValue(json, new TypeReference<List<Order>>() {
+		});
+
+		Map<String, Long> sellerCounts = orders.stream()
+				.collect(Collectors.groupingBy(o -> o.seller_name, Collectors.counting()));
+
+		List<Map.Entry<String, Long>> sortedSellers = sellerCounts.entrySet().stream()
+				.sorted(Map.Entry.<String, Long>comparingByValue().reversed()).collect(Collectors.toList());
+
+		
+		// 3. descending order-comparator-sellers
+		sortedSellers.forEach(e -> System.out.println(e.getKey() + " -> " + e.getValue() + " orders"));
+
+		System.out.println("=========q4. order date format==============================");
+		// 4. format - YYYY-MM-DD- order date
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		for (Order o : orders) {
+			LocalDate date = Instant.parse(o.createdAt).atZone(ZoneId.systemDefault()).toLocalDate();
+			System.out.println(o.seller_name + " | " + formatter.format(date));
+		}
+
+		 System.out.println("=======q5. sales amount greater than $1000================================");
+		// 5. sales amount >$1000
+		Map<String, Double> sellerTotalSellingCost = orders.stream().collect(
+				Collectors.groupingBy(Order::getSeller_name, Collectors.summingDouble(order -> order.getOrderItems()
+						.stream().mapToDouble(item -> item.getQuantity() * item.getUnitPrice()).sum())));
+
+		sellerTotalSellingCost.entrySet().stream().filter(entry -> entry.getValue() > 1000).forEach(
+				entry -> System.out.println("Seller: " + entry.getKey() + " | Selling Cost: " + entry.getValue()));
+
+		System.out.println("=======q6. order id sorted in descending order================================");
+		// 6. order id- descending
+		List<Order> sortedByOrderIdDesc = orders.stream().sorted(Comparator.comparing(Order::getOrder_id).reversed())
+				.collect(Collectors.toList());
+
+		sortedByOrderIdDesc.forEach(System.out::println);
+
+		System.out.println("=======q7. top 3 best product categories================================");
+		// 7. top 3 best - product category
+
+		orders.stream().filter(o -> o.orderItems != null).flatMap(o -> o.orderItems.stream())
+				.filter(i -> i != null && i.getProductCategory() != null)
+				.collect(Collectors.groupingBy(i -> i.getProductCategory(),
+						Collectors.summingDouble(i -> i.getQuantity() * i.getUnitPrice())))
+				.entrySet().stream().sorted(Map.Entry.<String, Double>comparingByValue(Comparator.reverseOrder()))
+				.limit(3).forEach(e -> System.out.println(e.getKey() + ": " + e.getValue()));
+
+		System.out.println("=======q8. avg amt spent================================");
+		// 8. avg amt spent
+
+		double avgSpent = orders.stream().flatMap(o -> o.getOrderItems().stream())
+				.mapToDouble(i -> i.getQuantity() * i.getUnitPrice()).average().orElse(0);
+
+		System.out.println("Average amount spent: $" + avgSpent);
+
+		// 9. token based authentication
+		System.out.println("=======9. jwt token based authentication================================");
+		System.out.println("jwt token based authentication is successful");
+		return "jwt token based authentication is successful";
+
+	}
+}

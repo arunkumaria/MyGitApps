@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping>
+
+	<!-- Employee mapping -->
+  <class name="manyToMany.GeekEmployeeData" table="geekEmployeeData">
+      <id name="id" type="int" column="id">
+         <generator class="native"/>
+      </id>
+      
+      <set name="skillSets" cascade="save-update" table="geekEmployeeSkill">
+         <key column="geekEmpId"/>
+         <many-to-many column="skillId" class="manyToMany.SkillsetData" />
+      </set>
+      
+      <property name="firstName" column="first_name" type="string"/>
+      <property name="lastName" column="last_name" type="string"/>
+      <property name="salary" column="salary" type="int"/>
+  </class>
+
+	<!-- Skill mapping -->
+	<class name="manyToMany.SkillsetData" table="SkillsetData">
+      <id name="id" type="int" column="id">
+         <generator class="native"/>
+      </id>
+      <property name="skillName" column="skillName" type="string"/>
+  </class>
+</hibernate-mapping>
