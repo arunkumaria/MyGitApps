@@ -4,6 +4,6 @@ import com.own.payment.dto.TransactionDto;
 
 public interface TransactionStatusProcessor {
 
-	public TransactionDto processStatus(TransactionDto transactionDto);
+	public TransactionDto processStatus(TransactionDto transactionDto) throws Exception ;
 
 }

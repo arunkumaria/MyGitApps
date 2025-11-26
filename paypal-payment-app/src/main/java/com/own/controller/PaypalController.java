@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.own.pojo.CreateOrderRequest;
 import com.own.pojo.CreatePaymentRequest;
+import com.own.pojo.InitiatePaymentRequest;
 import com.own.pojo.OrderResponse;
 import com.own.pojo.PaymentResponse;
 import com.own.service.interfaces.PaypalProviderServiceInterface;
@@ -52,6 +53,28 @@ public class PaypalController {
 		log.info("create payment request: {}", createPaymentRequest);
 		PaymentResponse paymentResponse = paypalProviderServiceInterface.createPayment(createPaymentRequest);
 		log.info("payment response: {}", paymentResponse);
+		return paymentResponse;
+
+	}
+
+	@PostMapping("/initiate-payment/{txnReference}/initiate")
+	public PaymentResponse initiatePayment(@PathVariable String txnReference,
+			@RequestBody InitiatePaymentRequest initiatePaymentRequest) throws Exception {
+
+		log.info("initiate payment request: {}", initiatePaymentRequest);
+		PaymentResponse paymentResponse = paypalProviderServiceInterface.initiatePayment(txnReference,
+				initiatePaymentRequest);
+		log.info("initiate payment response: {}", paymentResponse);
+		return paymentResponse;
+
+	}
+
+	@PostMapping("/capture-payment/{txnReference}/capture")
+	public PaymentResponse capturePayment(@PathVariable String txnReference) throws Exception {
+
+		log.info("capture payment txnReference: {}", txnReference);
+		PaymentResponse paymentResponse = paypalProviderServiceInterface.capturePayment(txnReference);
+		log.info("capture payment response: {}", paymentResponse);
 		return paymentResponse;
 
 	}
