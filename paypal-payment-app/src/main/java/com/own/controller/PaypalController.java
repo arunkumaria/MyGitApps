@@ -36,7 +36,7 @@ public class PaypalController {
 		return orderResponse;
 	}
 
-	@PostMapping("/{orderId}/capture")
+	@PostMapping("/capture-order/{orderId}/capture")
 	public OrderResponse captureOrder(@PathVariable String orderId)
 			throws JsonMappingException, JsonProcessingException {
 
