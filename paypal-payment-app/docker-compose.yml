@@ -1,43 +1,46 @@
-version: '3.9'
-
-networks:
-  spring-mysql-net:
-    driver: bridge
+version: '3.8'
 
 services:
-  mysql:
+  mysql-db:
     image: mysql:8
     container_name: mysql-db
-    restart: always
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root          # ✔ actual root password
-      MYSQL_DATABASE: payments           # ✔ match with Spring DB name
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: payments
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
       - ./mysql/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
+      interval: 10s
+      retries: 5
     networks:
-      - spring-mysql-net
+      - payment-network
 
-  app:
-    build: .
-    container_name: spring-app
-    depends_on:
-      mysql:
-        condition: service_healthy
-    ports:
-      - "8082:8082"
+  spring-app:
+    image: pay-pro-image
+    container_name: pay-pro-container
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/payments?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/payments?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
     networks:
-      - spring-mysql-net
+      - payment-network
+
 volumes:
- mysql_data:
+  db_data:
+
+networks:
+  payment-network:
+    driver: bridge

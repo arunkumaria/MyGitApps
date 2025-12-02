@@ -106,16 +106,21 @@ public class PaypalProviderServiceImpl implements PaypalProviderServiceInterface
 	@Override
 	public PaymentResponse createPayment(CreatePaymentRequest createPaymentRequest) throws Exception {
 
+		log.info("start create payment");
 		TransactionDto transactionDto = modelMapper.map(createPaymentRequest, TransactionDto.class);
 
 		transactionDto.setTxnStatusId(1); //created
 		transactionDto.setTxnReference(UUID.randomUUID().toString());
 
+		log.info("start db response");
 		TransactionDto response = paymentStatusService.processPayment(transactionDto);
+		log.info("end db response");
 
 		PaymentResponse paymentResponse = new PaymentResponse();
 		paymentResponse.setTxnReference(response.getTxnReference());
 		paymentResponse.setTxnStatusId(response.getTxnStatusId());
+		
+		log.info("end create payment");
 
 		return paymentResponse;
 	}

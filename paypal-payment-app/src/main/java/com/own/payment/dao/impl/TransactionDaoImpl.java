@@ -24,7 +24,8 @@ public class TransactionDaoImpl implements TransactionDaoInterface {
 
 	public TransactionEntity createTransaction(TransactionEntity transactionEntity) {
 
-		String sql = "INSERT INTO `TRANSACTION`(userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, amount, currency, merchantTransactionReference, txnReference, providerReference, errorCode, errorMessage, retryCount) VALUES(:userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, :amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, :errorCode, :errorMessage, :retryCount)";
+		String sql = "INSERT INTO `Transaction`(userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, amount, currency, merchantTransactionReference, txnReference, providerReference, errorCode, errorMessage, retryCount) VALUES(:userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, :amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, :errorCode, :errorMessage, :retryCount)";
+
 
 		SqlParameterSource sqlParameterSource = new BeanPropertySqlParameterSource(transactionEntity);
 
@@ -44,7 +45,7 @@ public class TransactionDaoImpl implements TransactionDaoInterface {
 
 	public TransactionEntity getTransaction(String txnReference) {
 
-		String sql = "SELECT * FROM `TRANSACTION` WHERE txnReference= :txnReference LIMIT 1";
+		String sql = "SELECT * FROM `Transaction` WHERE txnReference= :txnReference LIMIT 1";
 
 		Map<String, Object> param = new HashMap<>();
 		param.put("txnReference", txnReference);
@@ -58,7 +59,7 @@ public class TransactionDaoImpl implements TransactionDaoInterface {
 
 	public void updateTransaction(TransactionEntity transactionEntity) throws Exception {
 
-		String sql = "UPDATE `TRANSACTION` SET txnStatusId = :txnStatusId, providerReference = :providerReference WHERE id = :id";
+		String sql = "UPDATE `Transaction` SET txnStatusId = :txnStatusId, providerReference = :providerReference WHERE id = :id";
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("txnStatusId", transactionEntity.getTxnStatusId());
