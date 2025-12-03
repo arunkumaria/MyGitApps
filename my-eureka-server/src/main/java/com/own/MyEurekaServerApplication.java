@@ -2,14 +2,14 @@ package com.own;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 @SpringBootApplication
-@EnableDiscoveryClient
-public class MyPaypalPaymentAppApplication {
+@EnableEurekaServer
+public class MyEurekaServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MyPaypalPaymentAppApplication.class, args);
+		SpringApplication.run(MyEurekaServerApplication.class, args);
 	}
 
 }
