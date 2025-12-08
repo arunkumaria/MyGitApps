@@ -38,11 +38,9 @@ public class TokenService {
 	private static final String PAYPAL_TOKEN_REDIS = "PAYPAL_TOKEN_REDIS";
 	private static final int DIFF = 60;
 
-	private final RedisService redisService;
-	
-	String accessToken;
+	//private final RedisService redisService;
 
-	//private static String accessToken;
+	private static String accessToken;
 
 	private final HttpServiceEngine httpServiceEngine;
 
@@ -51,7 +49,7 @@ public class TokenService {
 	public String getAccessToken(CreateOrderRequest createOrderRequest)
 			throws JsonMappingException, JsonProcessingException {
 
-		//String accessToken = redisService.getValue(PAYPAL_TOKEN_REDIS);// get from redis
+		//accessToken = redisService.getValue(PAYPAL_TOKEN_REDIS);// get from redis
 
 		log.info("TokenService-getAccessToken entered with request: {}", createOrderRequest);
 		if (accessToken != null) {
@@ -78,7 +76,9 @@ public class TokenService {
 
 		accessToken = paypalOAuthToken.getAccessToken();
 
-		//redisService.setValueWithExpiry(PAYPAL_TOKEN_REDIS, accessToken,paypalOAuthToken.getExpiresIn() - DIFF);
+		log.info("redis started");
+		//redisService.setValueWithExpiry(PAYPAL_TOKEN_REDIS, accessToken, paypalOAuthToken.getExpiresIn() - DIFF);
+		log.info("redis ended");
 
 		log.info("TokenService-getAccessToken entered with accessToken: {}", accessToken);
 

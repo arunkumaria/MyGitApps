@@ -25,6 +25,12 @@ public class TransactionDaoImpl implements TransactionDaoInterface {
 	public TransactionEntity createTransaction(TransactionEntity transactionEntity) {
 
 		String sql = "INSERT INTO `Transaction`(userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, amount, currency, merchantTransactionReference, txnReference, providerReference, errorCode, errorMessage, retryCount) VALUES(:userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, :amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, :errorCode, :errorMessage, :retryCount)";
+//		String sql = "INSERT INTO `TRANSACTION` (" + "userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, "
+//				+ "amount, currency, merchantTransactionReference, txnReference, providerReference,"
+//				+ "errorCode, errorMessage, retryCount" + ")VALUES ("
+//				+ ":userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, "
+//				+ ":amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, "
+//				+ ":errorCode, :errorMessage, :retryCount" + ")";
 
 
 		SqlParameterSource sqlParameterSource = new BeanPropertySqlParameterSource(transactionEntity);

@@ -1,9 +1,10 @@
 package com.own.controller;
 
 public interface PaymentService {
-	public OrderResponse createOrder(CreateOrderReq createOrderReq);
 
-	public OrderResponse captureOrder(String orderId);
+	public OrderResponse createOrder(CreateOrderReq createOrderReq) throws Exception;
+
+	public OrderResponse captureOrder(String orderId) throws Exception;
 
 	public PaymentResponse createPayment(CreatePaymentRequest createPaymentRequest) throws Exception;
 

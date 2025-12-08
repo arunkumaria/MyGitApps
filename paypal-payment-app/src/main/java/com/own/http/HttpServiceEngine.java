@@ -21,7 +21,7 @@ public class HttpServiceEngine {
 
 	private final RestClient restClient;
 
-	@CircuitBreaker(name = "my-payment-processing", fallbackMethod = "paymentFallback")
+	//@CircuitBreaker(name = "my-payment-processing", fallbackMethod = "paymentFallback")
 
 	public ResponseEntity<String> makeHttpCall(HttpRequest httpRequest) {
 

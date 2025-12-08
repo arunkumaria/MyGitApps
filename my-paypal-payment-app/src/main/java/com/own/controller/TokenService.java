@@ -30,7 +30,7 @@ public class TokenService {
 
 	private final JsonUtil jsonUtil;
 
-	public String getAccessToken() {
+	public String getAccessToken() throws Exception {
 		if (accessToken != null) {
 			log.info("Returning cached access token");
 			return accessToken;

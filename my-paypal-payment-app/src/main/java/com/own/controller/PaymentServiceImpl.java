@@ -34,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
 	private final PPCaptureOrderHelper ppCaptureOrderHelper;
 
 	@Override
-	public OrderResponse createOrder(CreateOrderReq createOrderReq) {
+	public OrderResponse createOrder(CreateOrderReq createOrderReq) throws Exception {
 		log.info("payment service entered");
 
 		paymentValidator.validation(createOrderReq);
@@ -59,7 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
-	public OrderResponse captureOrder(String orderId) {
+	public OrderResponse captureOrder(String orderId) throws Exception {
 		log.info("capture order enteredwith orderId: {}", orderId);
 
 		String accessToken = tokenService.getAccessToken();
@@ -150,7 +150,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 		// capture the provider reference
 		HttpRequest httpRequest = ppCaptureOrderHelper.prepareRequest(txnReference, transactionDto);
-		
+
 		ResponseEntity<String> response = httpServiceEngine.makeHttpCall(httpRequest);
 		PPOrderResponse ppOrderResponse = ppCaptureOrderHelper.processResponse(response);
 

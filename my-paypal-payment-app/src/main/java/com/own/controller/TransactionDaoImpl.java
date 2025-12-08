@@ -21,13 +21,15 @@ public class TransactionDaoImpl implements TransactionDao {
 
 	@Override
 	public TransactionEntity createTransaction(TransactionEntity transactionEntity) {
-		// TODO Auto-generated method stub
-		String sql = "INSERT INTO `TRANSACTION` (" + "userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, "
-				+ "amount, currency, merchantTransactionReference, txnReference, providerReference,"
-				+ "errorCode, errorMessage, retryCount" + ")VALUES ("
-				+ ":userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, "
-				+ ":amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, "
-				+ ":errorCode, :errorMessage, :retryCount" + ")";
+//		// TODO Auto-generated method stub
+//		String sql = "INSERT INTO `TRANSACTION` (" + "userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, "
+//				+ "amount, currency, merchantTransactionReference, txnReference, providerReference,"
+//				+ "errorCode, errorMessage, retryCount" + ")VALUES ("
+//				+ ":userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, "
+//				+ ":amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, "
+//				+ ":errorCode, :errorMessage, :retryCount" + ")";
+		
+		String sql = "INSERT INTO `Transaction`(userId, paymentMethodId, providerId, paymentTypeId, txnStatusId, amount, currency, merchantTransactionReference, txnReference, providerReference, errorCode, errorMessage, retryCount) VALUES(:userId, :paymentMethodId, :providerId, :paymentTypeId, :txnStatusId, :amount, :currency, :merchantTransactionReference, :txnReference, :providerReference, :errorCode, :errorMessage, :retryCount)";
 
 		SqlParameterSource sqlParameterSource = new BeanPropertySqlParameterSource(transactionEntity);
 
@@ -47,7 +49,9 @@ public class TransactionDaoImpl implements TransactionDao {
 	public TransactionEntity getTransaction(String txnReference) {
 		// TODO Auto-generated method stub
 
-		String sql = "SELECT * FROM `TRANSACTION` WHERE txnReference = :txnReference LIMIT 1";
+		//String sql = "SELECT * FROM `TRANSACTION` WHERE txnReference = :txnReference LIMIT 1";
+		
+		String sql = "SELECT * FROM `Transaction` WHERE txnReference = :txnReference LIMIT 1";
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("txnReference", txnReference);
@@ -62,7 +66,9 @@ public class TransactionDaoImpl implements TransactionDao {
 	public void updateTransaction(TransactionEntity transactionEntity) throws Exception {
 		// TODO Auto-generated method stub
 
-		String sql = "UPDATE `TRANSACTION` SET txnStatusId = :txnStatusId, providerReference = :providerReference WHERE id = :id";
+		//String sql = "UPDATE `TRANSACTION` SET txnStatusId = :txnStatusId, providerReference = :providerReference WHERE id = :id";
+		
+		String sql = "UPDATE `Transaction` SET txnStatusId = :txnStatusId, providerReference = :providerReference WHERE id = :id";
 
 		Map<String, Object> params = new HashMap();
 		params.put("txnStatusId", transactionEntity.getTxnStatusId());
