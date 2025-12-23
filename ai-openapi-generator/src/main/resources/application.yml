@@ -1,9 +1,9 @@
-openai:
-  api-key: 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
-  model: gpt-4.1-mini
-
-chroma:
-  base-url: https://api.openai.com
-
-server:
-  port: 8080
+#openai:
+#  api-key: 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
+#  model: gpt-4.1-mini
+#
+#chroma:
+#  base-url: https://api.openai.com
+#
+#server:
+#  port: 8080
