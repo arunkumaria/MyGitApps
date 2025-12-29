@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  wowza:
+    image: wowzamedia/wowza-streaming-engine-linux:4.8.24
+    container_name: wowza-server
+    ports:
+      - "1935:1935"
+      - "8086:8086"
+      - "8087:8087"
+      - "8088:8088"
+    environment:
+      - WSE_MGR_USER=admin
+      - WSE_MGR_PASS=admin
+      - WSE_LIC=TRIAL
+    networks:
+      - wowza-network
+    restart: unless-stopped
+
+networks:
+  wowza-network:
+    driver: bridge

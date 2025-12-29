@@ -1,0 +1,5 @@
+#Version: 1.0
+#Start-Date: 2025-12-27 12:24:23 UTC
+#Software:  4.9.6+3 build20251002163549
+#Date: 2025-12-27
+#Fields: x-severity	x-category	x-event	date	time	c-client-id	c-ip	c-port	cs-bytes	sc-bytes	x-duration	x-sname	x-stream-id	x-spos	sc-stream-bytes	cs-stream-bytes	x-file-size	x-file-length	x-ctx	x-comment
