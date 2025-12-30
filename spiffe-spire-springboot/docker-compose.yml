@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  spire-server:
+    image: ghcr.io/spiffe/spire-server:1.9.0
+    container_name: spire-server
+    command:
+      - "-config"
+      - "/spire/conf/server.conf"
+    volumes:
+      - ./spire/server:/spire/conf
+      - ./spire/data:/spire/data
+    ports:
+      - "8081:8081"
+
+  spire-agent:
+    image: ghcr.io/spiffe/spire-agent:1.9.0
+    container_name: spire-agent
+    command:
+      - "-config"
+      - "/spire/conf/agent.conf"
+      - "-joinToken"
+      - "3759db2e-fe34-460d-a7de-19c8a70510ee"
+      - "-insecureBootstrap"
+    depends_on:
+      - spire-server
+    volumes:
+      - ./spire/agent:/spire/conf
+      - ./spire/data-agent:/spire/data
+      - /var/run/docker.sock:/var/run/docker.sock

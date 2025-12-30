@@ -1,0 +1,7 @@
+server:
+  port: 8443
+  ssl:
+    key-store: ""
+    key-store-type: PKCS12
+    key-alias: spiffe
+    key-store-password: ""
