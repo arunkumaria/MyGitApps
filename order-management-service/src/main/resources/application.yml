@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: order-management-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/orderdb
+    username: root
+    password: dinavella5
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: order-service-group
+      auto-offset-reset: earliest
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.apache.kafka.common.serialization.StringDeserializer
+
+# JWT Configuration
+jwt:
+  secret: THIS_IS_A_VERY_SECURE_SECRET_KEY_12345678901234567890
+  expiration: 3600000   # 1 hour in milliseconds
+
+# Logging (optional but useful)
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
