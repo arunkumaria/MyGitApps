@@ -1,0 +1,10 @@
+#server:
+#  port: 8080
+#
+#jwt:
+#  secret: "myUltraLongSuperSecretKey1234567890_!@#secure"
+#  expirationMs: 3600000
+#
+#spring:
+#  application:
+#    name: spring-boot-jwt
