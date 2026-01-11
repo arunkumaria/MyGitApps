@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.own.dto.AuthRequest;
 import com.own.model.User;
-import com.own.service.UserService;
+import com.own.service.impl.UserServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthController {
 
-	private final UserService userService;
+	private final UserServiceImpl userServiceImpl;
 
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody User user) {
-		if (userService.registerService(user) != null) {
+	public ResponseEntity<?> register(@RequestBody AuthRequest authRequest) {
+		if (userServiceImpl.registerService(authRequest) != null) {
 			return ResponseEntity.ok("user registered successfully");
 		} else {
 			return ResponseEntity.ok("user registration failed");
@@ -32,10 +33,9 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password) {
+	public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
 
-		log.info("username"+username);
-		return ResponseEntity.ok(userService.loginService(username, password));
+		return ResponseEntity.ok(userServiceImpl.loginService(authRequest));
 	}
 
 }

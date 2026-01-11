@@ -1,6 +1,6 @@
-package com.own.model;
+package com.own.dto;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,20 +12,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Entity
-@Table(name = "users")
+@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
-
+public class OrderResponse {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String productName;
+	private Integer quantity;
+	private Double price;
+	private AuthResponse authResponse;
 
-	@Column(nullable = false, unique = true)
-	private String username;
-	private String password;
-	private Long mobile;
-	private Double salary;
 }
