@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
+shopify:
+  api:
+    key: YOUR_API_KEY
+    secret: YOUR_API_SECRET
+  redirect:
+    uri: https://yourapp.com/auth/callback
