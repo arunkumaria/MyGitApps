@@ -1,6 +1,7 @@
 package com.own.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,16 +22,19 @@ public class OrderService {
 	@Autowired
 	private WebClient webClient;
 
-	public Order createOrder(OrderRequest request) {
+	public ResponseEntity<?> createOrder(OrderRequest request) {
 
 		// 🔹 Call third-party API (Payment)
-		String response = webClient.post().uri("developer.paypal.com/dashboard/?statusId=eyJzdGF0dXMiOiJBQk9SVEVEIn0%3D")
+		String response = webClient.post()
+				.uri("developer.paypal.com/dashboard/?statusId=eyJzdGF0dXMiOiJBQk9SVEVEIn0%3D")
 				.bodyValue(new PaymentRequest(request.getAmount())).retrieve().bodyToMono(String.class).block(); // blocking
 																													// for
 																													// simplicity
 
 		if (response == null) {
-			throw new RuntimeException("Payment failed");
+			return ResponseEntity.ok("\"Payment failed\"");
+			// throw new RuntimeException("Payment failed");
+
 		}
 
 		// 🔹 Save order
@@ -38,6 +42,6 @@ public class OrderService {
 		order.setProduct(request.getProduct());
 		order.setAmount(request.getAmount());
 
-		return repository.save(order);
+		return ResponseEntity.ok(repository.save(order));
 	}
 }
