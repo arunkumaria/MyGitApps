@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.own.dto.OrderRequest;
 import com.own.entity.Order;
+import com.own.enums.OrderStatus;
 import com.own.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,8 @@ public class OrderController {
 
 	@PutMapping("/{id}/status")
 	public Order updateStatus(@PathVariable Long id, @RequestParam String status) {
-		return service.updateStatus(id, status);
+		
+		return service.updateStatus(id, OrderStatus.PENDING);
 	}
 
 	@GetMapping("/{id}")
