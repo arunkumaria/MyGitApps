@@ -1,35 +1,38 @@
 package com.own;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import com.own.dto.OrderRequest;
-import com.own.entity.Order;
+import com.own.dto.CreateOrderRequest;
 import com.own.entity.OrderItem;
-import com.own.service.OrderService;
+import com.own.entity.Product;
+import com.own.service.OrderServiceImpl;
+import com.own.service.ProductService;
 
-@SpringBootTest
-class OrderServiceFeaturesApplicationTests {
+class OrderServiceTest {
 
-    @Autowired
-    private OrderService service;
+	@Test
+	void shouldFailWhenStockInsufficient() {
+		ProductService productService = new ProductService();
 
-    @Test
-    void testCreateOrder() {
-        OrderItem item = new OrderItem(null, "Phone", 2, 500.0);
+		Product p = new Product();
+		p.setName("Phone");
+		p.setStock(1);
+		p.setPrice(1000);
+		productService.add(p);
 
-        OrderRequest request = new OrderRequest();
-        request.setItems(List.of(item));
+		OrderServiceImpl orderService = new OrderServiceImpl(productService);
 
-        Order order = service.createOrder(request);
+		OrderItem item = new OrderItem();
+		item.setId(Long.parseLong(p.getId()));
+		item.setQuantity(5);
 
-        assertNotNull(order.getId());
-        assertEquals(1000.0, order.getTotalPrice());
-    }
+		CreateOrderRequest req = new CreateOrderRequest();
+		req.setItems(List.of(item));
+
+		assertThrows(RuntimeException.class, () -> orderService.create(req));
+	}
 }
