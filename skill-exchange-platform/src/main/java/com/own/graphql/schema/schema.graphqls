@@ -1,0 +1,59 @@
+type User {
+ id:ID
+ email:String
+}
+
+type Skill {
+ id:ID
+ name:String
+}
+
+type SwapRequest {
+ id:ID
+ status:SwapStatus
+}
+
+enum SkillLevel{
+ BEGINNER
+ INTERMEDIATE
+ ADVANCED
+}
+
+enum SwapStatus{
+ PENDING
+ ACCEPTED
+ REJECTED
+}
+
+type Query{
+
+ me:User
+
+ matches:[User]
+
+ swapRequests:[SwapRequest]
+
+}
+
+type Mutation{
+
+ register(email:String!,password:String!):String
+
+ login(email:String!,password:String!):String
+
+ addSkillTeach(skill:String!,level:SkillLevel!):Boolean
+
+ addSkillLearn(skill:String!,level:SkillLevel!):Boolean
+
+ createSwap(
+  receiverId:ID!,
+  offeredSkill:String!,
+  wantedSkill:String!
+ ):SwapRequest
+
+ respondSwap(
+  requestId:ID!,
+  accept:Boolean!
+ ):SwapRequest
+
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root version="2">
+    <Application>
+        <Name>live</Name>
+        <AppType>Live</AppType>
+        <Description>Live streaming application</Description>
+        <Connections>
+            <AutoAccept>true</AutoAccept>
+            <AllowDomains></AllowDomains>
+        </Connections>
+        <Streams>
+            <StreamType>live</StreamType>
+            <StorageDir></StorageDir>
+            <LiveStreamPacketizers>cupertinostreamingpacketizer,smoothstreamingpacketizer,sanjosestreamingpacketizer,mpegdashstreamingpacketizer</LiveStreamPacketizers>
+        </Streams>
+        <Modules>
+            <Module>
+                <Name>base</Name>
+                <Description>Base</Description>
+                <Class>com.wowza.wms.module.ModuleCore</Class>
+            </Module>
+            <Module>
+                <Name>logging</Name>
+                <Description>Client Logging</Description>
+                <Class>com.wowza.wms.module.ModuleClientLogging</Class>
+            </Module>
+            <Module>
+                <Name>ModuleConnectionLogger</Name>
+                <Description>Spring Boot Connection Logger</Description>
+                <Class>com.mycompany.wowza.ModuleConnectionLogger</Class>
+            </Module>
+            <Module>
+                <Name>ModulePublishAuth</Name>
+                <Description>Spring Boot Publish Authentication</Description>
+                <Class>com.mycompany.wowza.ModulePublishAuth</Class>
+            </Module>
+        </Modules>
+    </Application>
+</Root>

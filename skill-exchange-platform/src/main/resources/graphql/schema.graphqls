@@ -1,0 +1,17 @@
+type Query {
+  _dummy: String
+}
+
+
+type AuthResponse {
+  token: String
+  email: String
+  message: String
+}
+
+type Mutation {
+  register(email: String!, password: String!): AuthResponse
+  login(email: String!, password: String!): AuthResponse
+}
+
+
