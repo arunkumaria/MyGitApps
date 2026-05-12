@@ -1,80 +1,105 @@
 package com.own.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.own.dto.OrderItemRequest;
+import com.own.dto.OrderRequest;
 import com.own.entity.Customer;
 import com.own.entity.Order;
 import com.own.entity.OrderItem;
 import com.own.entity.Product;
 import com.own.enums.OrderStatus;
+import com.own.enums.PaymentStatus;
+import com.own.exceptions.InsufficientStockException;
+import com.own.exceptions.ResourceNotFoundException;
 import com.own.repository.CustomerRepository;
 import com.own.repository.OrderRepository;
 import com.own.repository.ProductRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
-	@Autowired
-	private OrderRepository orderRepo;
-	@Autowired
-	private ProductRepository productRepo;
-	@Autowired
-	private CustomerRepository customerRepo;
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
+    private final PaymentService paymentService;
 
-	public Order createOrder(Long customerId, List<OrderItem> items) {
+    public Order createOrder(OrderRequest request) {
 
-		Customer customer = customerRepo.findById(customerId)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer not found"));
 
-		Order order = new Order();
-		order.setCustomer(customer);
-		order.setStatus(OrderStatus.PENDING);
-		order.setCreatedAt(LocalDateTime.now());
+        Order order = new Order();
+        order.setCustomer(customer);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setOrderStatus(OrderStatus.PENDING);
 
-		for (OrderItem item : items) {
+        List<OrderItem> orderItems = new ArrayList<>();
 
-			Product product = productRepo.findById(item.getProduct().getId())
-					.orElseThrow(() -> new RuntimeException("Product not found"));
+        for (OrderItemRequest itemRequest : request.getItems()) {
 
-			// 🔥 INVENTORY CHECK
-			if (product.getStock() < item.getQuantity()) {
-				throw new RuntimeException("Insufficient stock for product: " + product.getName());
-			}
+            Product product = productRepository.findById(itemRequest.getProductId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Product not found"));
 
-			// 🔥 REDUCE STOCK
-			product.setStock(product.getStock() - item.getQuantity());
+            if (product.getStock() < itemRequest.getQuantity()) {
+                throw new InsufficientStockException(
+                        "Insufficient stock for product: " + product.getName());
+            }
 
-			item.setPrice(product.getPrice());
-			item.setOrder(order);
-		}
+            product.setStock(product.getStock() - itemRequest.getQuantity());
 
-		order.setItems(items);
+            productRepository.save(product);
 
-		return orderRepo.save(order);
-	}
+            OrderItem item = new OrderItem();
+            item.setOrder(order);
+            item.setProduct(product);
+            item.setQuantity(itemRequest.getQuantity());
+            item.setPrice(product.getPrice());
 
-	public Order updateStatus(Long orderId, OrderStatus newStatus) {
+            orderItems.add(item);
+        }
 
-		Order order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        PaymentStatus paymentStatus = paymentService.processPayment();
 
-		// 🔥 STATE TRANSITION LOGIC
-		if (order.getStatus() == OrderStatus.CANCELLED) {
-			throw new RuntimeException("Cannot update cancelled order");
-		}
+        order.setPaymentStatus(paymentStatus);
+        order.setItems(orderItems);
 
-		order.setStatus(newStatus);
-		return orderRepo.save(order);
-	}
+        if (paymentStatus == PaymentStatus.SUCCESS) {
+            order.setOrderStatus(OrderStatus.CONFIRMED);
+        }
 
-	public Order getOrder(Long id) {
-		return orderRepo.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
-	}
+        return orderRepository.save(order);
+    }
 
-	public List<Order> getCustomerOrders(Long customerId) {
-		return orderRepo.findByCustomerId(customerId);
-	}
+    public Order updateOrderStatus(Long orderId, OrderStatus status) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found"));
+
+        order.setOrderStatus(status);
+
+        return orderRepository.save(order);
+    }
+
+    public Order getOrder(Long orderId) {
+
+        return orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found"));
+    }
+
+    public List<Order> getCustomerOrders(Long customerId) {
+
+        return orderRepository.findByCustomerId(customerId);
+    }
 }

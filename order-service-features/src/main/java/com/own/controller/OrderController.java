@@ -2,7 +2,6 @@ package com.own.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,31 +11,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.own.dto.OrderRequest;
 import com.own.entity.Order;
-import com.own.entity.OrderItem;
 import com.own.enums.OrderStatus;
 import com.own.service.OrderService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired private OrderService service;
+	private final OrderService orderService;
 
-    @PostMapping("/{customerId}")
-    public Order createOrder(@PathVariable Long customerId,
-                             @RequestBody List<OrderItem> items) {
-        return service.createOrder(customerId, items);
-    }
+	@PostMapping
+	public Order createOrder(@RequestBody OrderRequest request) {
 
-    @PutMapping("/{id}/status")
-    public Order updateStatus(@PathVariable Long id,
-                             @RequestParam OrderStatus status) {
-        return service.updateStatus(id, status);
-    }
+		return orderService.createOrder(request);
+	}
 
-    @GetMapping("/{id}")
-    public Order getOrder(@PathVariable Long id) {
-        return service.getOrder(id);
-    }
+	@PutMapping("/{id}/status")
+	public Order updateStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
+
+		return orderService.updateOrderStatus(id, status);
+	}
+
+	@GetMapping("/{id}")
+	public Order getOrder(@PathVariable Long id) {
+
+		return orderService.getOrder(id);
+	}
+
+	@GetMapping("/customer/{customerId}")
+	public List<Order> getCustomerOrders(@PathVariable Long customerId) {
+
+		return orderService.getCustomerOrders(customerId);
+	}
 }
