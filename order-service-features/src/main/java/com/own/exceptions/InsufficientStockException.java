@@ -2,5 +2,8 @@ package com.own.exceptions;
 
 
 public class InsufficientStockException extends RuntimeException {
-    public InsufficientStockException(String msg) { super(msg); }
+
+    public InsufficientStockException(String message) {
+        super(message);
+    }
 }

@@ -1,14 +1,23 @@
 package com.own.entity;
 
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product {
-	private String id;
-	private String name;
-	private int stock;
-	private double price;
-	
 
-	// getters & setters
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String name;
+
+	private Double price;
+
+	private Integer stock;
 }

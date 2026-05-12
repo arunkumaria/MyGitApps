@@ -1,24 +1,29 @@
 package com.own.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderItem {
 
-    @Id @GeneratedValue
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne
-    private Product product;
+	private Integer quantity;
 
-    private int quantity;
-    private double price;
+	private Double price;
 
-    @ManyToOne
-    private Order order;
+	@ManyToOne
+	@JoinColumn(name = "product_id")
+	private Product product;
+
+	@ManyToOne
+	@JoinColumn(name = "order_id")
+	private Order order;
 }
