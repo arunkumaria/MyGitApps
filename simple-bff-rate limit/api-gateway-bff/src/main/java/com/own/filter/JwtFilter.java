@@ -1,19 +1,25 @@
 package com.own.filter;
 
-import java.nio.charset.StandardCharsets;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+
+import org.springframework.core.Ordered;
+
+import org.springframework.http.HttpStatus;
+
+import org.springframework.stereotype.Component;
+
+import org.springframework.web.server.ServerWebExchange;
+
 import reactor.core.publisher.Mono;
+
+import javax.crypto.SecretKey;
+
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtFilter implements GlobalFilter, Ordered {
@@ -31,7 +37,8 @@ public class JwtFilter implements GlobalFilter, Ordered {
             ServerWebExchange exchange,
             GatewayFilterChain chain
     ) {
-    	String path =
+
+        String path =
                 exchange.getRequest()
                         .getURI()
                         .getPath();
@@ -54,7 +61,8 @@ public class JwtFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        String token = authHeader.substring(7);
+        String token =
+                authHeader.substring(7);
 
         try {
 
