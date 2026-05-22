@@ -1,47 +1,33 @@
 package com.own.controller;
 
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/bff")
 public class BffController {
 
-    private final RestTemplate restTemplate =
-            new RestTemplate();
+	private final RestTemplate restTemplate = new RestTemplate();
 
-    @GetMapping("/dashboard")
-    public Map<String, Object> dashboard() {
+	@GetMapping(value = "/bff/dashboard", produces = "application/json")
+	public ResponseEntity<Map<String, Object>> dashboard() {
 
-        System.out.println("Calling restaurant service");
+		List restaurants = restTemplate.getForObject("http://localhost:8082/restaurants", List.class);
 
-        Object restaurants =
-                restTemplate.getForObject(
-                        "http://localhost:8082/restaurants",
-                        Object.class
-                );
+		List foods = restTemplate.getForObject("http://localhost:8083/foods", List.class);
 
-        System.out.println("Calling food service");
+		Map<String, Object> response = new HashMap<>();
 
-        Object foods =
-                restTemplate.getForObject(
-                        "http://localhost:8083/foods",
-                        Object.class
-                );
+		response.put("restaurants", restaurants);
+		response.put("foods", foods);
 
-        Map<String, Object> response =
-                new HashMap<>();
-
-        response.put("restaurants", restaurants);
-        response.put("foods", foods);
-
-        return response;
-    }
+		return ResponseEntity.ok(response);
+	}
 }

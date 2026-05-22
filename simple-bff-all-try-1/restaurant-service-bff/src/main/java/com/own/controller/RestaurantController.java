@@ -1,23 +1,27 @@
 package com.own.controller;
 
-import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.own.model.Restaurant;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/restaurants")
 public class RestaurantController {
 
-    @GetMapping
-    public List<Restaurant> getRestaurants() {
+    @GetMapping("/restaurants")
+    public List<Map<String, Object>> restaurants() {
 
         return List.of(
-                new Restaurant(1L, "Dominos"),
-                new Restaurant(2L, "KFC")
+                Map.of(
+                        "id", 1,
+                        "name", "Dominos"
+                ),
+                Map.of(
+                        "id", 2,
+                        "name", "KFC"
+                )
         );
     }
 }
