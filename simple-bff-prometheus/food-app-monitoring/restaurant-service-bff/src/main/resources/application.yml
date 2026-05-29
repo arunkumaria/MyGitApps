@@ -1,0 +1,57 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: restaurant-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: restaurant-group
+      auto-offset-reset: earliest
+
+      properties:
+        spring.json.trusted.packages: "*"
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},traceId=%X{traceId:-},spanId=%X{spanId:-}]"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
