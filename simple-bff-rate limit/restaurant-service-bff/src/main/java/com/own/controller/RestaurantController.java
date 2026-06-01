@@ -1,27 +1,30 @@
 package com.own.controller;
 
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.github.bucket4j.Bucket;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
+@RequestMapping("/restaurants")
+@RequiredArgsConstructor
 public class RestaurantController {
 
-    @GetMapping("/restaurants")
-    public List<Map<String, Object>> restaurants() {
+	private final Bucket restaurantBucket;
 
-        return List.of(
-                Map.of(
-                        "id", 1,
-                        "name", "Dominos"
-                ),
-                Map.of(
-                        "id", 2,
-                        "name", "KFC"
-                )
-        );
-    }
+	@GetMapping
+	public ResponseEntity<?> restaurants() {
+
+		boolean allowed = restaurantBucket.tryConsume(1);
+
+		System.out.println("Allowed = " + allowed);
+
+		if (!allowed) {
+			return ResponseEntity.status(429).body("Restaurant limit exceeded");
+		}
+
+		return ResponseEntity.ok(List.of("Dominos", "KFC", "Burger King"));
+	}
 }
