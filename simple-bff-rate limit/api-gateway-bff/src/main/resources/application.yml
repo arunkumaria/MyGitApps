@@ -2,46 +2,31 @@ server:
   port: 8080
 
 spring:
-
-  main:
-    web-application-type: reactive
-
   application:
     name: api-gateway
 
-  redis:
-    host: localhost
-    port: 6379
-
   cloud:
-
     gateway:
 
       routes:
 
-        - id: auth-service
-          uri: lb://AUTH-SERVICE
-          predicates:
-            - Path=/auth/**
+        - id: restaurant-service
 
-        - id: bff-service
-          uri: lb://BFF-SERVICE
+          uri: lb://restaurant-service
+
           predicates:
-            - Path=/bff/**
+            - Path=/restaurants/**
 
           filters:
-
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-                key-resolver: "#{@userKeyResolver}"
+            - RateLimitFilter
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka
 
-logging:
-  level:
-    reactor.netty: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

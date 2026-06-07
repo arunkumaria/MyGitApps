@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+
+        - id: bff-service
+
+          uri: lb://BFF-SERVICE
+
+          predicates:
+            - Path=/bff/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},traceId=%X{traceId:-},spanId=%X{spanId:-}]"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
