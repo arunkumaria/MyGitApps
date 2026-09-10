@@ -95,7 +95,8 @@ public class CustomerServiceImpl implements CustomerService {
 	@Transactional(readOnly = true)
 	public CustomerResponse getCustomer(UUID id) {
 
-		Customer customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("customer not found: "+ id));
+		Customer customer = customerRepository.findById(id)
+				.orElseThrow(() -> new CustomerNotFoundException("customer not found: " + id));
 
 		return mapToResponse(customer);
 	}
@@ -107,13 +108,43 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public CustomerResponse updateCustomer(UUID id, CustomerRequest customerRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		Customer customer = customerRepository.findById(id)
+				.orElseThrow(() -> new CustomerNotFoundException("customer not found: " + id));
+
+		if (!(customer.getEmail().equals(customerRequest.getEmail())
+				&& customerRepository.existsByEmail(customerRequest.getEmail()))) {
+			throw new IllegalArgumentException(
+					"another customer already exists with this email: " + customerRequest.getEmail());
+		}
+
+		customer.setName(customerRequest.getName());
+		customer.setEmail(customerRequest.getEmail());
+		customer.setCompany(customerRequest.getCompany());
+		customer.setPhone(customerRequest.getPhone());
+
+		if (customerRequest.getCustomerSegment() != null) {
+			customer.setSegment(customerRequest.getCustomerSegment());
+		}
+
+		if (customerRequest.getCustomerStatus() != null) {
+			customer.setStatus(customerRequest.getCustomerStatus());
+		}
+
+		Customer updatedCustomer = customerRepository.save(customer);
+
+		CustomerEvent customerEvent = buildEvent(updatedCustomer, "CUSTOMER_UPDATED");
+
+		customerEventProducer.publishCustomerUpdated(customerEvent);
+
+		return mapToResponse(updatedCustomer);
+
 	}
 
 	@Override
 	public void deleteCustomer(UUID id) {
-		// TODO Auto-generated method stub
+		Customer customer = customerRepository.findById(id)
+				.orElseThrow(() -> new CustomerNotFoundException("customer not found: " + id));
+		customerRepository.delete(customer);
 
 	}
 
