@@ -40,12 +40,12 @@ public class CustomerController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(customerResponse);
 	}
 
-	@GetMapping
+	@GetMapping("/{id}")
 	public ResponseEntity<CustomerResponse> getCustomer(@PathVariable UUID id) {
 		return ResponseEntity.ok(customerService.getCustomer(id));
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping
 	public ResponseEntity<Page<CustomerResponse>> getCustomers(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "createdAt") String sortBy,
 			@RequestParam(defaultValue = "DESC") String direction) {

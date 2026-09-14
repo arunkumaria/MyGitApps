@@ -111,8 +111,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customer = customerRepository.findById(id)
 				.orElseThrow(() -> new CustomerNotFoundException("customer not found: " + id));
 
-		if (!(customer.getEmail().equals(customerRequest.getEmail())
-				&& customerRepository.existsByEmail(customerRequest.getEmail()))) {
+		if (!customer.getEmail().equals(customerRequest.getEmail()) && customerRepository.existsByEmail(customerRequest.getEmail())) {
 			throw new IllegalArgumentException(
 					"another customer already exists with this email: " + customerRequest.getEmail());
 		}
