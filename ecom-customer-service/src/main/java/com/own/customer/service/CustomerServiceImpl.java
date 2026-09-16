@@ -3,6 +3,9 @@ package com.own.customer.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,31 +24,41 @@ import com.own.customer.repository.CustomerRepository;
 public class CustomerServiceImpl implements CustomerService {
 
 	private final CustomerRepository customerRepository;
+
 	private final CustomerEventProducer customerEventProducer;
 
 	public CustomerServiceImpl(CustomerRepository customerRepository, CustomerEventProducer customerEventProducer) {
+
 		this.customerRepository = customerRepository;
 		this.customerEventProducer = customerEventProducer;
-
 	}
 
 	@Override
+	@CachePut(value = "customers", key = "#result.id")
 	public CustomerResponse createCustomer(CustomerRequest customerRequest) {
+
 		if (customerRepository.existsByEmail(customerRequest.getEmail())) {
-			throw new IllegalArgumentException("customer with email already exists" + customerRequest.getEmail());
+
+			throw new IllegalArgumentException("customer with email already exists: " + customerRequest.getEmail());
 		}
 
 		Customer customer = new Customer();
+
 		customer.setName(customerRequest.getName());
+
 		customer.setEmail(customerRequest.getEmail());
+
 		customer.setPhone(customerRequest.getPhone());
+
 		customer.setCompany(customerRequest.getCompany());
 
 		if (customerRequest.getCustomerSegment() != null) {
+
 			customer.setSegment(customerRequest.getCustomerSegment());
 		}
 
 		if (customerRequest.getCustomerStatus() != null) {
+
 			customer.setStatus(customerRequest.getCustomerStatus());
 		}
 
@@ -56,42 +69,10 @@ public class CustomerServiceImpl implements CustomerService {
 		customerEventProducer.publishCustomerCreated(event);
 
 		return mapToResponse(savedCustomer);
-
-	}
-
-	private CustomerResponse mapToResponse(Customer customer) {
-
-		CustomerResponse customerResponse = new CustomerResponse();
-		customerResponse.setId(customer.getId());
-		customerResponse.setName(customer.getName());
-		customerResponse.setEmail(customer.getEmail());
-		customerResponse.setCompany(customer.getCompany());
-		customerResponse.setPhone(customer.getPhone());
-		customerResponse.setSegment(customer.getSegment());
-		customerResponse.setStatus(customer.getStatus());
-		customerResponse.setCreatedAt(customer.getCreatedAt());
-		customerResponse.setUpdatedAt(customer.getUpdatedAt());
-
-		return customerResponse;
-	}
-
-	private CustomerEvent buildEvent(Customer customer, String eventType) {
-
-		CustomerEvent customerEvent = new CustomerEvent();
-		customerEvent.setCustomerId(customer.getId());
-		customerEvent.setEventType(eventType);
-		customerEvent.setName(customer.getName());
-		customerEvent.setEmail(customer.getEmail());
-		customerEvent.setCompany(customer.getCompany());
-		customerEvent.setCustomerStatus(customer.getStatus());
-		customerEvent.setCustomerSegment(customer.getSegment());
-		customerEvent.setTimestamp(LocalDateTime.now());
-
-		return customerEvent;
-
 	}
 
 	@Override
+	@Cacheable(value = "customers", key = "#id")
 	@Transactional(readOnly = true)
 	public CustomerResponse getCustomer(UUID id) {
 
@@ -102,30 +83,41 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Page<CustomerResponse> getCustomers(Pageable pageable) {
+
 		return customerRepository.findAll(pageable).map(this::mapToResponse);
 	}
 
 	@Override
+	@CachePut(value = "customers", key = "#id")
 	public CustomerResponse updateCustomer(UUID id, CustomerRequest customerRequest) {
+
 		Customer customer = customerRepository.findById(id)
 				.orElseThrow(() -> new CustomerNotFoundException("customer not found: " + id));
 
-		if (!customer.getEmail().equals(customerRequest.getEmail()) && customerRepository.existsByEmail(customerRequest.getEmail())) {
+		if (!customer.getEmail().equals(customerRequest.getEmail())
+				&& customerRepository.existsByEmail(customerRequest.getEmail())) {
+
 			throw new IllegalArgumentException(
 					"another customer already exists with this email: " + customerRequest.getEmail());
 		}
 
 		customer.setName(customerRequest.getName());
+
 		customer.setEmail(customerRequest.getEmail());
+
 		customer.setCompany(customerRequest.getCompany());
+
 		customer.setPhone(customerRequest.getPhone());
 
 		if (customerRequest.getCustomerSegment() != null) {
+
 			customer.setSegment(customerRequest.getCustomerSegment());
 		}
 
 		if (customerRequest.getCustomerStatus() != null) {
+
 			customer.setStatus(customerRequest.getCustomerStatus());
 		}
 
@@ -136,15 +128,63 @@ public class CustomerServiceImpl implements CustomerService {
 		customerEventProducer.publishCustomerUpdated(customerEvent);
 
 		return mapToResponse(updatedCustomer);
-
 	}
 
 	@Override
+	@CacheEvict(value = "customers", key = "#id")
 	public void deleteCustomer(UUID id) {
+
 		Customer customer = customerRepository.findById(id)
 				.orElseThrow(() -> new CustomerNotFoundException("customer not found: " + id));
-		customerRepository.delete(customer);
 
+		customerRepository.delete(customer);
 	}
 
+	private CustomerResponse mapToResponse(Customer customer) {
+
+		CustomerResponse customerResponse = new CustomerResponse();
+
+		customerResponse.setId(customer.getId());
+
+		customerResponse.setName(customer.getName());
+
+		customerResponse.setEmail(customer.getEmail());
+
+		customerResponse.setCompany(customer.getCompany());
+
+		customerResponse.setPhone(customer.getPhone());
+
+		customerResponse.setSegment(customer.getSegment());
+
+		customerResponse.setStatus(customer.getStatus());
+
+		customerResponse.setCreatedAt(customer.getCreatedAt());
+
+		customerResponse.setUpdatedAt(customer.getUpdatedAt());
+
+		return customerResponse;
+	}
+
+	private CustomerEvent buildEvent(Customer customer, String eventType) {
+
+		CustomerEvent customerEvent = new CustomerEvent();
+
+		customerEvent.setCustomerId(customer.getId());
+
+		customerEvent.setEventType(eventType);
+
+		customerEvent.setName(customer.getName());
+
+		customerEvent.setEmail(customer.getEmail());
+
+		customerEvent.setCompany(customer.getCompany());
+
+		customerEvent.setCustomerStatus(customer.getStatus());
+
+		customerEvent.setCustomerSegment(customer.getSegment());
+
+		customerEvent.setTimestamp(LocalDateTime.now());
+
+		return customerEvent;
+	}
 }

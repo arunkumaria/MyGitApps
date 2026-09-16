@@ -12,6 +12,12 @@ spring:
     password: dinavella5
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      timeout: 2s
+
   jpa:
     hibernate:
       ddl-auto: update

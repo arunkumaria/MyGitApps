@@ -9,7 +9,7 @@ services:
       MYSQL_DATABASE: marketing_customer_db
 
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
     volumes:
       - mysql_data:/var/lib/mysql
@@ -30,6 +30,26 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: customer-redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "ping"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - marketing-network
+    restart: unless-stopped
 
   kafka:
     image: apache/kafka:4.0.0
@@ -89,6 +109,9 @@ services:
 
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
+networks:
+  marketing-network:
+    driver: bridge
 
 volumes:
   mysql_data:

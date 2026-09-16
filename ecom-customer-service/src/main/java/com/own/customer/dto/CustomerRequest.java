@@ -1,5 +1,6 @@
 package com.own.customer.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.own.customer.entity.CustomerSegment;
 import com.own.customer.entity.CustomerStatus;
 
@@ -24,8 +25,11 @@ public class CustomerRequest {
 	@Size(max = 30)
 	private String company;
 
-	private CustomerStatus customerStatus;
+	@JsonProperty("segment")
 	private CustomerSegment customerSegment;
+
+	@JsonProperty("status")
+	private CustomerStatus customerStatus;
 
 	public String getName() {
 		return name;
