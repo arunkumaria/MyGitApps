@@ -8,13 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.own.customer.dto.CustomerResponse;
 
 @Configuration
 @EnableCaching
@@ -30,14 +31,16 @@ public class RedisConfig {
 	public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory,
 			ObjectMapper redisObjectMapper) {
 
-		GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(redisObjectMapper);
+		Jackson2JsonRedisSerializer<CustomerResponse> customerSerializer = new Jackson2JsonRedisSerializer<>(
+				redisObjectMapper, CustomerResponse.class);
 
-		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+		RedisCacheConfiguration customerCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
 				.entryTtl(Duration.ofMinutes(10))
 				.serializeKeysWith(
 						RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-				.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
+				.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(customerSerializer));
 
-		return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(cacheConfiguration).build();
+		return RedisCacheManager.builder(redisConnectionFactory)
+				.withCacheConfiguration("customers", customerCacheConfiguration).build();
 	}
 }
