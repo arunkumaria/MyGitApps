@@ -1,30 +1,21 @@
 server:
   port: 8081
 
-
 spring:
-
   application:
     name: ecom-customer-service
 
-
   datasource:
-
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/marketing_customer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-
     username: ${SPRING_DATASOURCE_USERNAME:root}
-
     password: ${SPRING_DATASOURCE_PASSWORD:dinavella5}
-
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     hikari:
       connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
       initialization-fail-timeout: ${SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT:0}
 
-
   jpa:
-
     hibernate:
       ddl-auto: update
 
@@ -34,30 +25,20 @@ spring:
       hibernate:
         format_sql: true
 
-
   data:
-
     redis:
-
       host: ${SPRING_REDIS_HOST:localhost}
-
       port: ${SPRING_REDIS_PORT:6379}
-
       timeout: 2s
 
-
   kafka:
-
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
 
     producer:
-
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
       properties:
-
         spring.json.add.type.headers: false
 
 
@@ -66,9 +47,7 @@ spring:
 # ============================================================
 
 ai:
-
   analytics:
-
     base-url: ${AI_ANALYTICS_BASE_URL:http://localhost:8082}
 
 
@@ -83,11 +62,9 @@ resilience4j:
   # ----------------------------------------------------------
 
   circuitbreaker:
-
     instances:
 
       aiAnalyticsService:
-
         registerHealthIndicator: true
 
         slidingWindowType: COUNT_BASED
@@ -105,11 +82,8 @@ resilience4j:
         automaticTransitionFromOpenToHalfOpenEnabled: true
 
         recordExceptions:
-
           - org.springframework.web.client.RestClientException
-
           - java.util.concurrent.TimeoutException
-
           - java.io.IOException
 
 
@@ -118,19 +92,15 @@ resilience4j:
   # ----------------------------------------------------------
 
   retry:
-
     instances:
 
       aiAnalyticsService:
-
         maxAttempts: 3
 
         waitDuration: 1s
 
         retryExceptions:
-
           - org.springframework.web.client.RestClientException
-
           - java.util.concurrent.TimeoutException
 
 
@@ -139,14 +109,33 @@ resilience4j:
   # ----------------------------------------------------------
 
   timelimiter:
-
     instances:
 
       aiAnalyticsService:
-
         timeoutDuration: 3s
 
         cancelRunningFuture: true
+
+
+# ============================================================
+# SWAGGER / OPENAPI
+# ============================================================
+
+springdoc:
+
+  api-docs:
+    path: /v3/api-docs
+
+  swagger-ui:
+    path: /swagger-ui.html
+
+    operations-sorter: method
+
+    tags-sorter: alpha
+
+    display-request-duration: true
+
+    try-it-out-enabled: true
 
 
 # ============================================================
@@ -156,33 +145,20 @@ resilience4j:
 management:
 
   endpoints:
-
     web:
-
       exposure:
-
         include:
-
           - health
-
           - info
-
           - metrics
-
           - prometheus
 
-
   endpoint:
-
     health:
-
       show-details: always
 
-
   metrics:
-
     tags:
-
       application: ecom-customer-service
 
 
@@ -193,9 +169,6 @@ management:
 logging:
 
   level:
-
     com.own.customer: INFO
-
     org.springframework.kafka: INFO
-
     io.github.resilience4j: INFO
