@@ -1,36 +1,26 @@
 version: '3.8'
 
-
 services:
 
   # ==========================================================
   # MYSQL
   # ==========================================================
-
   mysql:
-
     image: mysql:8.4
-
     container_name: marketing-mysql
-
     hostname: mysql
 
     environment:
-
       MYSQL_ROOT_PASSWORD: dinavella5
-
       MYSQL_DATABASE: marketing_customer_db
 
     ports:
-
       - "3307:3306"
 
     volumes:
-
       - mysql_data:/var/lib/mysql
 
     healthcheck:
-
       test:
         [
           "CMD",
@@ -43,17 +33,12 @@ services:
           "-pdinavella5",
           "--silent"
         ]
-
       interval: 10s
-
       timeout: 5s
-
       retries: 10
-
       start_period: 20s
 
     networks:
-
       - marketing-network
 
     restart: unless-stopped
@@ -62,38 +47,27 @@ services:
   # ==========================================================
   # REDIS
   # ==========================================================
-
   redis:
-
     image: redis:7-alpine
-
     container_name: customer-redis
-
     hostname: redis
 
     ports:
-
       - "6379:6379"
 
     healthcheck:
-
       test:
         [
           "CMD",
           "redis-cli",
           "ping"
         ]
-
       interval: 10s
-
       timeout: 5s
-
       retries: 5
-
       start_period: 5s
 
     networks:
-
       - marketing-network
 
     restart: unless-stopped
@@ -102,21 +76,15 @@ services:
   # ==========================================================
   # KAFKA
   # ==========================================================
-
   kafka:
-
     image: apache/kafka:4.0.0
-
     container_name: marketing-kafka
-
     hostname: kafka
 
     ports:
-
       - "29092:29092"
 
     environment:
-
       CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
 
       KAFKA_NODE_ID: 1
@@ -144,23 +112,17 @@ services:
       KAFKA_NUM_PARTITIONS: 3
 
     healthcheck:
-
       test:
         [
           "CMD-SHELL",
           "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1 || exit 1"
         ]
-
       interval: 10s
-
       timeout: 10s
-
       retries: 10
-
       start_period: 20s
 
     networks:
-
       - marketing-network
 
     restart: unless-stopped
@@ -169,29 +131,25 @@ services:
   # ==========================================================
   # CUSTOMER SERVICE
   # ==========================================================
-
   customer-service:
-
     build: .
 
     container_name: customer-service
 
     depends_on:
-
       mysql:
-
         condition: service_healthy
 
       redis:
-
         condition: service_healthy
 
       kafka:
+        condition: service_healthy
 
+      elasticsearch:
         condition: service_healthy
 
     ports:
-
       - "8081:8081"
 
     environment:
@@ -199,7 +157,6 @@ services:
       # ------------------------------------------------------
       # MYSQL
       # ------------------------------------------------------
-
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/marketing_customer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 
       SPRING_DATASOURCE_USERNAME: root
@@ -210,7 +167,6 @@ services:
       # ------------------------------------------------------
       # REDIS
       # ------------------------------------------------------
-
       SPRING_REDIS_HOST: redis
 
       SPRING_REDIS_PORT: 6379
@@ -219,18 +175,21 @@ services:
       # ------------------------------------------------------
       # KAFKA
       # ------------------------------------------------------
-
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
 
       # ------------------------------------------------------
       # AI ANALYTICS SERVICE
       # ------------------------------------------------------
-
       AI_ANALYTICS_BASE_URL: http://ai-analytics-service:8082
 
-    networks:
 
+      # ------------------------------------------------------
+      # ELASTICSEARCH
+      # ------------------------------------------------------
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+
+    networks:
       - marketing-network
 
     restart: unless-stopped
@@ -239,31 +198,122 @@ services:
   # ==========================================================
   # AI ANALYTICS SERVICE
   # ==========================================================
-
   ai-analytics-service:
-
     image: eclipse-temurin:17-jre
 
     container_name: ai-analytics-service
 
     ports:
-
       - "8082:8082"
 
     command:
-
       - java
-
       - -jar
-
       - /app/app.jar
 
     volumes:
-
       - ./ai-analytics-service/target/ai-analytics-service-1.0.0.jar:/app/app.jar
 
     networks:
+      - marketing-network
 
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # ELASTICSEARCH
+  # ==========================================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+
+    container_name: customer-elasticsearch
+
+    hostname: elasticsearch
+
+    environment:
+      discovery.type: single-node
+
+      xpack.security.enabled: "false"
+
+      xpack.security.enrollment.enabled: "false"
+
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
+    ports:
+      - "9200:9200"
+
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:9200/_cluster/health || exit 1"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+    networks:
+      - marketing-network
+
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # LOGSTASH
+  # ==========================================================
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.15.0
+
+    container_name: customer-logstash
+
+    hostname: logstash
+
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+    ports:
+      - "5044:5044"
+      - "5000:5000"
+      - "9600:9600"
+
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+
+    environment:
+      LS_JAVA_OPTS: "-Xms256m -Xmx256m"
+
+    networks:
+      - marketing-network
+
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # KIBANA
+  # ==========================================================
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.0
+
+    container_name: customer-kibana
+
+    hostname: kibana
+
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+    ports:
+      - "5601:5601"
+
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+
+    networks:
       - marketing-network
 
     restart: unless-stopped
@@ -272,27 +322,21 @@ services:
   # ==========================================================
   # PROMETHEUS
   # ==========================================================
-
   prometheus:
-
     image: prom/prometheus:latest
 
     container_name: customer-prometheus
 
     ports:
-
       - "9090:9090"
 
     volumes:
-
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
     depends_on:
-
       - customer-service
 
     networks:
-
       - marketing-network
 
     restart: unless-stopped
@@ -301,23 +345,35 @@ services:
   # ==========================================================
   # GRAFANA
   # ==========================================================
-
   grafana:
-
     image: grafana/grafana:latest
 
     container_name: customer-grafana
 
     ports:
-
       - "3000:3000"
 
     depends_on:
-
       - prometheus
 
     networks:
+      - marketing-network
 
+    restart: unless-stopped
+
+
+  # ==========================================================
+  # ZIPKIN
+  # ==========================================================
+  zipkin:
+    image: openzipkin/zipkin:latest
+
+    container_name: customer-zipkin
+
+    ports:
+      - "9411:9411"
+
+    networks:
       - marketing-network
 
     restart: unless-stopped
@@ -326,18 +382,17 @@ services:
 # ============================================================
 # NETWORK
 # ============================================================
-
 networks:
 
   marketing-network:
-
     driver: bridge
 
 
 # ============================================================
 # VOLUMES
 # ============================================================
-
 volumes:
 
   mysql_data:
+
+  elasticsearch_data:

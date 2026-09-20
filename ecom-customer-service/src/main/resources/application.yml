@@ -1,9 +1,15 @@
 server:
   port: 8081
 
+
 spring:
   application:
     name: ecom-customer-service
+
+
+  # ============================================================
+  # DATABASE
+  # ============================================================
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/marketing_customer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
@@ -15,6 +21,11 @@ spring:
       connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
       initialization-fail-timeout: ${SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT:0}
 
+
+  # ============================================================
+  # JPA / HIBERNATE
+  # ============================================================
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,11 +36,21 @@ spring:
       hibernate:
         format_sql: true
 
+
+  # ============================================================
+  # REDIS
+  # ============================================================
+
   data:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
       timeout: 2s
+
+
+  # ============================================================
+  # KAFKA
+  # ============================================================
 
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
@@ -57,9 +78,9 @@ ai:
 
 resilience4j:
 
-  # ----------------------------------------------------------
+  # ------------------------------------------------------------
   # CIRCUIT BREAKER
-  # ----------------------------------------------------------
+  # ------------------------------------------------------------
 
   circuitbreaker:
     instances:
@@ -68,7 +89,6 @@ resilience4j:
         registerHealthIndicator: true
 
         slidingWindowType: COUNT_BASED
-
         slidingWindowSize: 10
 
         minimumNumberOfCalls: 5
@@ -87,9 +107,9 @@ resilience4j:
           - java.io.IOException
 
 
-  # ----------------------------------------------------------
+  # ------------------------------------------------------------
   # RETRY
-  # ----------------------------------------------------------
+  # ------------------------------------------------------------
 
   retry:
     instances:
@@ -104,9 +124,9 @@ resilience4j:
           - java.util.concurrent.TimeoutException
 
 
-  # ----------------------------------------------------------
+  # ------------------------------------------------------------
   # TIME LIMITER
-  # ----------------------------------------------------------
+  # ------------------------------------------------------------
 
   timelimiter:
     instances:
@@ -128,21 +148,21 @@ springdoc:
 
   swagger-ui:
     path: /swagger-ui.html
-
     operations-sorter: method
-
     tags-sorter: alpha
-
     display-request-duration: true
-
     try-it-out-enabled: true
 
 
 # ============================================================
-# ACTUATOR + PROMETHEUS
+# ACTUATOR + PROMETHEUS + TRACING
 # ============================================================
 
 management:
+
+  # ------------------------------------------------------------
+  # ACTUATOR ENDPOINTS
+  # ------------------------------------------------------------
 
   endpoints:
     web:
@@ -153,13 +173,41 @@ management:
           - metrics
           - prometheus
 
+
+  # ------------------------------------------------------------
+  # HEALTH
+  # ------------------------------------------------------------
+
   endpoint:
     health:
       show-details: always
 
+
+  # ------------------------------------------------------------
+  # MICROMETER METRICS
+  # ------------------------------------------------------------
+
   metrics:
     tags:
       application: ecom-customer-service
+
+
+  # ------------------------------------------------------------
+  # DISTRIBUTED TRACING
+  # ------------------------------------------------------------
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+
+  # ------------------------------------------------------------
+  # ZIPKIN
+  # ------------------------------------------------------------
+
+  zipkin:
+    tracing:
+      endpoint: ${MANAGEMENT_ZIPKIN_TRACING_ENDPOINT:http://zipkin:9411/api/v2/spans}
 
 
 # ============================================================
@@ -169,6 +217,13 @@ management:
 logging:
 
   level:
+
+    root: INFO
+
     com.own.customer: INFO
+
     org.springframework.kafka: INFO
+
     io.github.resilience4j: INFO
+
+    org.springframework.web: INFO
