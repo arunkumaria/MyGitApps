@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(CustomerNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleNotFound(CustomerNotFoundException customerNotFoundException,
+	public ResponseEntity<ErrorResponse> handleCustomerNotFound(CustomerNotFoundException customerNotFoundException,
 			HttpServletRequest httpServletRequest) {
 		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), HttpStatus.NOT_FOUND.value(),
 				"Customer not found", customerNotFoundException.getMessage(), httpServletRequest.getRequestURI());
