@@ -6,7 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -33,6 +36,7 @@ import com.own.customer.dto.CustomerResponse;
 import com.own.customer.entity.CustomerSegment;
 import com.own.customer.entity.CustomerStatus;
 import com.own.customer.service.CustomerService;
+import static org.mockito.ArgumentMatchers.eq;
 
 @WebMvcTest(CustomerController.class)
 public class CustomerControllerTest3 {
@@ -106,6 +110,41 @@ public class CustomerControllerTest3 {
 		verify(customerService)
 				.getCustomers(argThat(pageable -> pageable.getPageNumber() == 0 && pageable.getPageSize() == 10
 						&& pageable.getSort().getOrderFor("createdAt").getDirection() == Sort.Direction.DESC));
+
+	}
+
+	@Test
+	public void updateCustomerShouldReturn200() throws Exception {
+
+		CustomerRequest customerRequest = new CustomerRequest();
+		customerRequest.setName("Arun");
+		customerRequest.setPhone("1234");
+		customerRequest.setEmail("arun@gmail");
+		customerRequest.setCustomerStatus(CustomerStatus.ACTIVE);
+		customerRequest.setCustomerSegment(CustomerSegment.PREMIUM);
+
+		CustomerResponse customerResponse = new CustomerResponse();
+		customerResponse.setCompany("soft");
+		customerResponse.setCreatedAt(LocalDateTime.now());
+		customerResponse.setEmail("arun@gmail.com");
+		UUID customerId = UUID.randomUUID();
+		customerResponse.setId(customerId);
+		customerResponse.setName("Arun");
+		customerResponse.setPhone("1234");
+		customerResponse.setSegment(CustomerSegment.PREMIUM);
+		customerResponse.setStatus(CustomerStatus.ACTIVE);
+		customerResponse.setUpdatedAt(LocalDateTime.now());
+
+		when(customerService.updateCustomer(eq(customerId), any(CustomerRequest.class))).thenReturn(customerResponse);
+
+		mockMvc.perform(put("/api/v1/customers/{id}", customerId).contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(customerRequest)))
+				.andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(customerId.toString()))
+				.andExpect(jsonPath("$.email").value("arun@gmail.com"));
+
+		verify(customerService).updateCustomer(eq(customerId), any(CustomerRequest.class));
+
+		System.out.println("REQUEST JSON = " + objectMapper.writeValueAsString(customerRequest));
 
 	}
 
