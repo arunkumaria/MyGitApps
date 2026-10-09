@@ -2,13 +2,16 @@ package com.own.customer.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,7 +21,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -36,7 +38,6 @@ import com.own.customer.dto.CustomerResponse;
 import com.own.customer.entity.CustomerSegment;
 import com.own.customer.entity.CustomerStatus;
 import com.own.customer.service.CustomerService;
-import static org.mockito.ArgumentMatchers.eq;
 
 @WebMvcTest(CustomerController.class)
 public class CustomerControllerTest3 {
@@ -146,6 +147,16 @@ public class CustomerControllerTest3 {
 
 		System.out.println("REQUEST JSON = " + objectMapper.writeValueAsString(customerRequest));
 
+	}
+
+	@Test
+	public void deleteCustomer() throws Exception {
+		final UUID customId = UUID.fromString("682cf0b9-9064-4d8d-86f4-2ec161a423a6");
+
+		doNothing().when(customerService).deleteCustomer(customId);
+		mockMvc.perform(delete("/api/v1/customers/{id}", customId)).andExpect(status().isNoContent());
+		verify(customerService).deleteCustomer(customId);
+		verifyNoInteractions(customerService);
 	}
 
 }
