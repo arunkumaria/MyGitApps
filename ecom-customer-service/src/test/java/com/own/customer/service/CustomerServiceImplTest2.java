@@ -67,4 +67,26 @@ class CustomerServiceImplTest2 {
 		verify(customerEventProducer).publishCustomerCreated(any(CustomerEvent.class));
 
 	}
+
+	@Test
+	void getCustomer() {
+		UUID id = UUID.randomUUID();
+		Customer customer = new Customer();
+		customer.setCompany("Upwork");
+		customer.setEmail("arun@gmail.com");
+		customer.setId(id);
+		customer.setName("Arun");
+		customer.setPhone("8553253334");
+		customer.setSegment(CustomerSegment.STANDARD);
+		customer.setStatus(CustomerStatus.ACTIVE);
+
+		when(customerRepository.findById(id)).thenReturn(Optional.of(customer));
+		CustomerResponse customerResponse = customerService.getCustomer(id);
+
+		assertNotNull(customerResponse);
+		assertEquals(id, customerResponse.getId());
+		assertEquals("Arun", customerResponse.getName());
+		assertEquals("arun@gmail.com", customerResponse.getEmail());
+		verify(customerRepository, times(1)).findById(id);
+	}
 }
