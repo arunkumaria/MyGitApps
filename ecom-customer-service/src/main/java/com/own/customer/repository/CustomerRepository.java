@@ -21,4 +21,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
 	Page<Customer> findByStatus(CustomerStatus customerStatus, Pageable page);
 
+	Page<Customer> findAll(Pageable pageable);
+
 }
