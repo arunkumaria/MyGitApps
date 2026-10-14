@@ -45,13 +45,29 @@ class CustomerServiceImplTest2 {
 
 	private CustomerRequest customerRequest;
 
+	private UUID customerId;
+
+	private Customer customer;
+
 	@BeforeEach
 	void setUp() {
+
+		customerId = UUID.randomUUID();
+
+		customer = new Customer();
+		customer.setCompany("upwork");
+		customer.setEmail("arun@upwork.com");
+		customer.setId(customerId);
+		customer.setName("Arun");
+		customer.setPhone("8553253334");
+		customer.setSegment(CustomerSegment.STANDARD);
+		customer.setStatus(CustomerStatus.ACTIVE);
+
 		customerRequest = new CustomerRequest();
-		customerRequest.setEmail("arun@gmail.com");
+		customerRequest.setEmail("arun@upwork.com");
 		customerRequest.setPhone("8553253334");
 		customerRequest.setName("Arun");
-		customerRequest.setCompany("Upwork");
+		customerRequest.setCompany("upwork");
 		customerRequest.setCustomerStatus(CustomerStatus.ACTIVE);
 		customerRequest.setCustomerSegment(CustomerSegment.STANDARD);
 
@@ -59,7 +75,7 @@ class CustomerServiceImplTest2 {
 
 	@Test
 	void createCustomer_success() {
-		when(customerRepository.existsByEmail("arun@gmail.com")).thenReturn(false);
+		when(customerRepository.existsByEmail("arun@upwork.com")).thenReturn(false);
 		when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> {
 			Customer customer = invocation.getArgument(0);
 			customer.setId(UUID.randomUUID());
@@ -68,8 +84,8 @@ class CustomerServiceImplTest2 {
 		CustomerResponse customerResponse = customerService.createCustomer(customerRequest);
 		assertNotNull(customerResponse);
 		assertEquals("Arun", customerResponse.getName());
-		assertEquals("arun@gmail.com", customerResponse.getEmail());
-		verify(customerRepository).existsByEmail("arun@gmail.com");
+		assertEquals("arun@upwork.com", customerResponse.getEmail());
+		verify(customerRepository).existsByEmail("arun@upwork.com");
 		verify(customerRepository).save(any(Customer.class));
 		verify(customerEventProducer).publishCustomerCreated(any(CustomerEvent.class));
 
@@ -80,7 +96,7 @@ class CustomerServiceImplTest2 {
 		UUID id = UUID.randomUUID();
 		Customer customer = new Customer();
 		customer.setCompany("Upwork");
-		customer.setEmail("arun@gmail.com");
+		customer.setEmail("arun@upwork.com");
 		customer.setId(id);
 		customer.setName("Arun");
 		customer.setPhone("8553253334");
@@ -93,7 +109,7 @@ class CustomerServiceImplTest2 {
 		assertNotNull(customerResponse);
 		assertEquals(id, customerResponse.getId());
 		assertEquals("Arun", customerResponse.getName());
-		assertEquals("arun@gmail.com", customerResponse.getEmail());
+		assertEquals("arun@upwork.com", customerResponse.getEmail());
 		verify(customerRepository, times(1)).findById(id);
 	}
 
@@ -127,5 +143,33 @@ class CustomerServiceImplTest2 {
 		assertEquals("arun@upwork.com", customerResponse.getEmail());
 
 		verify(customerRepository, times(1)).findAll(pageable);
+	}
+
+	@Test
+	void updateCustomer() {
+
+		customer.setEmail("arun@gmail.com");
+
+		// Requested email
+		customerRequest.setName("Arun");
+		customerRequest.setEmail("arun@upwork.com");
+
+		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+		when(customerRepository.existsByEmail("arun@upwork.com")).thenReturn(false);
+
+		when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+		CustomerResponse customerResponse = customerService.updateCustomer(customerId, customerRequest);
+
+		assertNotNull(customerResponse);
+		assertEquals("Arun", customer.getName());
+		assertEquals("arun@upwork.com", customer.getEmail());
+
+		verify(customerRepository).findById(customerId);
+		verify(customerRepository).existsByEmail("arun@upwork.com");
+		verify(customerRepository).save(customer);
+
+		verify(customerEventProducer).publishCustomerUpdated(any(CustomerEvent.class));
 	}
 }
