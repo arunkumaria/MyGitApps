@@ -1,5 +1,6 @@
 package com.own.customer.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -171,5 +172,20 @@ class CustomerServiceImplTest2 {
 		verify(customerRepository).save(customer);
 
 		verify(customerEventProducer).publishCustomerUpdated(any(CustomerEvent.class));
+	}
+
+	@Test
+	public void deleteCustomer() {
+
+		UUID customerId = UUID.randomUUID();
+		Customer customer = new Customer();
+
+		when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+		assertDoesNotThrow(() -> customerService.deleteCustomer(customerId));
+
+		verify(customerRepository).findById(customerId);
+		verify(customerRepository).delete(customer);
+
 	}
 }
