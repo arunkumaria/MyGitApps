@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.UUID;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +49,31 @@ public class CustomerRepositoryTest2 {
 		customer.setPhone("8553253334");
 		customer.setSegment(CustomerSegment.STANDARD);
 		customer.setStatus(CustomerStatus.ACTIVE);
-		
+
 		customerRepository.save(customer);
 
 		boolean exists = customerRepository.existsByEmail("arun@upwork.com");
 
 		assertTrue(exists);
+	}
+
+	@Test
+	void findById_retrieve_customer() {
+
+		Customer customer = new Customer();
+		customer.setCompany("upwork");
+		customer.setEmail("arun@upwork.com");
+		customer.setName("Arun Kumar");
+		customer.setPhone("8553253334");
+		customer.setSegment(CustomerSegment.STANDARD);
+		customer.setStatus(CustomerStatus.ACTIVE);
+
+		Customer saved = customerRepository.save(customer);
+
+		Optional<Customer> result = customerRepository.findById(saved.getId());
+
+		assertTrue(result.isPresent());
+		assertEquals("Arun Kumar", result.get().getName());
 	}
 
 }
