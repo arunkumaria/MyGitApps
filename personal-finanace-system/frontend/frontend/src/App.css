@@ -1,0 +1,142 @@
+
+:root {
+  font-family: Inter, system-ui, sans-serif;
+  color: #1f2937;
+  background: #f4f7fb;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button, input {
+  font: inherit;
+}
+
+button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 9px;
+  background: #176b50;
+  color: white;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #e4ece8;
+  color: #1f2937;
+}
+
+input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #d1d9e3;
+  border-radius: 8px;
+  background: white;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  font-size: 14px;
+}
+
+.login {
+  width: min(420px, calc(100% - 32px));
+  margin: 10vh auto;
+  padding: 28px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 35px #102b4010;
+}
+
+.login form {
+  display: grid;
+  gap: 18px;
+}
+
+.dashboard {
+  width: min(1100px, calc(100% - 32px));
+  margin: 40px auto;
+}
+
+header, .budget-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+header p {
+  color: #64748b;
+}
+
+.month-picker {
+  width: 200px;
+  margin: 26px 0;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cards article, .panel {
+  padding: 22px;
+  background: white;
+  border: 1px solid #e6ebf1;
+  border-radius: 14px;
+}
+
+.cards span, .budget p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.cards h2 {
+  overflow-wrap: anywhere;
+  font-size: clamp(18px, 2.5vw, 28px);
+}
+
+.panel {
+  margin-top: 24px;
+}
+
+.budget {
+  padding: 16px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.budget:last-child {
+  border-bottom: 0;
+}
+
+progress {
+  width: 100%;
+  height: 12px;
+  accent-color: #176b50;
+}
+
+.loading {
+  padding: 30px;
+}
+
+@media (max-width: 650px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  header {
+    align-items: flex-start;
+  }
+
+  .dashboard {
+    margin: 22px auto;
+  }
+}

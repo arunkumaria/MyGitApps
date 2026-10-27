@@ -1,0 +1,18 @@
+package com.finance.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.finance.entity.Category;
+import com.finance.entity.TransactionType;
+
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+
+	List<Category> findAllByUser_IdOrderByNameAsc(Long userId);
+
+	Optional<Category> findByIdAndUser_Id(Long id, Long userId);
+
+	Optional<Category> findByIdAndUser_IdAndType(Long id, Long userId, TransactionType type);
+}
