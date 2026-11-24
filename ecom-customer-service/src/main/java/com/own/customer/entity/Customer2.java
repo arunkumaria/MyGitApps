@@ -1,6 +1,7 @@
 package com.own.customer.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +22,7 @@ public class Customer2 {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	private String id;
+	private UUID id;
 
 	@Column(nullable = false, length = 100)
 	private String name;
@@ -71,11 +72,11 @@ public class Customer2 {
 		updatedAt = LocalDateTime.now();
 	}
 
-	public String getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 
