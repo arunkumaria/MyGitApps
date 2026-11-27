@@ -35,11 +35,11 @@ public class Customer2 {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
-	private CustomerStatus status;
+	private CustomerStatus2 status;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
-	private CustomerSegment segment;
+	private CustomerSegment2 segment;
 
 	@Column(length = 30)
 	private String company;
@@ -58,11 +58,11 @@ public class Customer2 {
 		updatedAt = localDateTime;
 
 		if (status == null) {
-			status = CustomerStatus.ACTIVE;
+			status = CustomerStatus2.ACTIVE;
 		}
 
 		if (segment == null) {
-			segment = CustomerSegment.STANDARD;
+			segment = CustomerSegment2.STANDARD;
 		}
 
 	}
@@ -112,12 +112,20 @@ public class Customer2 {
 		this.company = company;
 	}
 
-	public CustomerStatus getStatus() {
+	public CustomerStatus2 getStatus() {
 		return status;
 	}
 
-	public CustomerSegment getSegment() {
+	public CustomerSegment2 getSegment() {
 		return segment;
+	}
+
+	public void setSegment(CustomerSegment2 customerSegment2) {
+		this.segment = customerSegment2;
+	}
+
+	public void setStatus(CustomerStatus2 customerStatus2) {
+		this.status = customerStatus2;
 	}
 
 	public LocalDateTime getUpdatedAt() {
