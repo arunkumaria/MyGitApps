@@ -11,16 +11,18 @@ import com.own.customer.dto.CustomerRequest2;
 import com.own.customer.dto.CustomerResponse2;
 import com.own.customer.entity.Customer2;
 import com.own.customer.kafka.CustomerEventProducer;
+import com.own.customer.kafka.CustomerEventProducer2;
 import com.own.customer.repository.CustomerRepository2;
 
 public class CustomerServiceImpl2 implements CustomerService2 {
 
 	private final CustomerRepository2 customerRepository2;
-	private final CustomerEventProducer customerEventProducer;
+	private final CustomerEventProducer2 customerEventProducer2;
 
-	public CustomerServiceImpl2(CustomerRepository2 customerRepository2, CustomerEventProducer customerEventProducer) {
+	public CustomerServiceImpl2(CustomerRepository2 customerRepository2,
+			CustomerEventProducer2 customerEventProducer2) {
 		this.customerRepository2 = customerRepository2;
-		this.customerEventProducer = customerEventProducer;
+		this.customerEventProducer2 = customerEventProducer2;
 	}
 
 	@Override
@@ -46,12 +48,11 @@ public class CustomerServiceImpl2 implements CustomerService2 {
 		}
 
 		Customer2 savedCustomer2 = customerRepository2.save(customer2);
-		
-		CustomerEvent2 customerEvent2 = buildEvent(savedCustomer2, "CUSTOMER-CREATED");
-		//customerEventProducer.publishCustomerCreated(customerEvent2);
-		
+
+		CustomerEvent2 customerEvent2 = buildEvent(savedCustomer2, "customer-created");
+		customerEventProducer2.publishCustomerCreated(customerEvent2);
+
 		return mapToResponse(savedCustomer2);
-		
 
 	}
 
@@ -95,10 +96,10 @@ public class CustomerServiceImpl2 implements CustomerService2 {
 		return customerEvent2;
 
 	}
-	
+
 	public CustomerResponse2 mapToResponse(Customer2 customer2) {
 		CustomerResponse2 customerResponse2 = new CustomerResponse2();
-		
+
 		customerResponse2.setId(customer2.getId());
 		customerResponse2.setName(customer2.getName());
 		customerResponse2.setEmail(customer2.getEmail());
@@ -106,10 +107,9 @@ public class CustomerServiceImpl2 implements CustomerService2 {
 		customerResponse2.setCustomerStatus2(customer2.getStatus());
 		customerResponse2.setCreatedAt(customer2.getCreatedAt());
 		customerResponse2.setUpdatedAt(customer2.getUpdatedAt());
-		
+
 		return customerResponse2;
-		
-		
+
 	}
 
 }
